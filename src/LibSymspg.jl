@@ -19,13 +19,15 @@ export call_libfoo
 
 # Function to call into the `libfoo` shared library with the given arguments
 function call_libfoo()
-    global libsymspg
-
+    # global libsymspg
+    hdl = Libdl.dlopen_e(libsymspg)
+    println(hdl)
     # hdl = Libdl.dlopen_e(libfoo)
     # @assert hdl != C_NULL "Could not open $libfoo"
     # foo = Libdl.dlsym_e(hdl, :foo)
     # @assert foo != C_NULL "Could not find foo() within $libfoo"
     # return ccall(foo, Cdouble, (Cdouble, Cdouble), a, b)
+    return true
 end
 
 end #module LibSymspg
