@@ -33,3 +33,4 @@ latt = [-2.0 2.0 2.0; 2.0 -2.0 2.0; 2.0 2.0 -2.0]
 positions = [0.0 0.0 0.0]
 types = [1]
 num_atom = 1
+db = spg_get_dataset(latt, positions, types, num_atom, 1e-5)
