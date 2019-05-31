@@ -21,9 +21,9 @@ export spg_find_primitive, spg_refine_cell
 """
 spg_standardize_cell standardize cell
 
-lattice are represented as colume vector here
+lattice are represented as row vector here
 means each colume is a basis of lattice
-positions are also represented as colume vector
+positions are also represented as row vector
 means each row is a coordinate (x, y, z) of an atom
 """
 function spg_standardize_cell(lattice::Array{Float64, 2},
@@ -33,8 +33,9 @@ function spg_standardize_cell(lattice::Array{Float64, 2},
                               to_primitive::Int64,
                               no_idealize::Int64,
                               symprec::Float64=1e-5)
-    # block effect on arguments
-    lattice = copy(lattice)
+    # transpose to colomn vector used by spglib
+    lattice = Array{Float64, 2}(lattice')
+    positions = Array{Float64, 2}(positions')
 
     allocN = 4
     positions_ = zeros(Float64, 3, num_atom*allocN)
@@ -55,6 +56,10 @@ function spg_standardize_cell(lattice::Array{Float64, 2},
 
     positions = positions_[:, 1:num_primitive_atom]
     types = types_[1:num_primitive_atom]
+
+    # transpose back to row vectors
+    lattice = Array{Float64, 2}(lattice')
+    positions = Array{Float64, 2}(positions')
 
     return lattice, positions, Base.cconvert(Array{Int64, 1}, types), Base.cconvert(Int64,num_primitive_atom)
 end
