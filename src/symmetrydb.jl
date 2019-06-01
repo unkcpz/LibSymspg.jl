@@ -1,3 +1,5 @@
+export get_spacegroup
+
 mutable struct SpglibDB
     spacegroup_number::Cint
     hall_number::Cint
@@ -28,8 +30,10 @@ function spg_get_dataset(lattice::Array{Float64, 2},
                          types::Array{Int64, 1},
                          num_atom::Int64,
                          symprec::Float64=1e-5)
+
+    @assert size(positions)[1] == size(types)[1] == num_atom
+
     # transpose to colomn vector used by spglib
-    lattice = Array{Float64, 2}(lattice')
     positions = Array{Float64, 2}(positions')
 
     types = Base.cconvert(Array{Int32, 1}, types)
@@ -46,8 +50,14 @@ end
 
 function get_spacegroup(lattice::Array{Float64, 2},
                         positions::Array{Float64, 2},
-                        types::Array{Float64, 1},
+                        types::Array{Int64, 1},
                         symprec::Float64=1e-5)
+    #
+    num_atom = size(types)[1]
+
+    db = spg_get_dataset(lattice, positions, types, num_atom, symprec)
+    s = collect(Char.(db.international_symbol))
+    return String(s), Base.convert(Int64, db.spacegroup_number)
 end
 
 function get_symmetry()

@@ -5,7 +5,7 @@ spg_standardize_cell standardize cell
 
 lattice are represented as row vector here
 means each colume is a basis of lattice
-positions are also represented as row vector
+positions are represented as row vector
 means each row is a coordinate (x, y, z) of an atom
 """
 function spg_standardize_cell(lattice::Array{Float64, 2},
@@ -19,7 +19,7 @@ function spg_standardize_cell(lattice::Array{Float64, 2},
     @assert size(positions)[1] == size(types)[1] == num_atom
 
     # transpose to colomn vector used by spglib
-    lattice = Array{Float64, 2}(lattice')
+    lattice_ = copy(lattice)
     positions = Array{Float64, 2}(positions')
 
     allocN = 4
@@ -37,16 +37,15 @@ function spg_standardize_cell(lattice::Array{Float64, 2},
     num_primitive_atom =
     ccall( (:spg_standardize_cell, libsymspg), Int32,
            ( Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Int32, Int32, Int32, Float64 ),
-           lattice, positions_, types_, num_atom, to_primitive, no_idealize, symprec )
+           lattice_, positions_, types_, num_atom, to_primitive, no_idealize, symprec )
 
     positions = positions_[:, 1:num_primitive_atom]
     types = types_[1:num_primitive_atom]
 
     # transpose back to row vectors
-    lattice = Array{Float64, 2}(lattice')
     positions = Array{Float64, 2}(positions')
 
-    return lattice, positions, Base.cconvert(Array{Int64, 1}, types), Base.cconvert(Int64,num_primitive_atom)
+    return lattice_, positions, Base.cconvert(Array{Int64, 1}, types), Base.cconvert(Int64,num_primitive_atom)
 end
 
 function standardize_cell(lattice::Array{Float64, 2},
@@ -65,9 +64,9 @@ function standardize_cell(lattice::Array{Float64, 2},
 end
 
 """
-spg_find_primitive reduce crystal to its primitive
+find_primitive reduce crystal to its primitive
 
-lattice are represented as colume vector here
+lattice are represented as row vector here
 means each colume is a basis of lattice
 while positions are represented as row vector
 means each row is a coordinate (x, y, z) of an atom
@@ -81,9 +80,9 @@ function find_primitive(lattice::Array{Float64, 2},
 end
 
 """
-spg_refine_cell refine crystal to its convetional
+refine_cell refine crystal to its convetional
 
-lattice are represented as colume vector here
+lattice are represented as row vector here
 means each colume is a basis of lattice
 while positions are represented as row vector
 means each row is a coordinate (x, y, z) of an atom

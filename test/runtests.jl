@@ -24,8 +24,11 @@ latt, positions, types = refine_cell(latt, positions, types, 1e-5)
 @test positions ≈ [0.0 0.0 0.0; 0.5 0.5 0.5]
 @test types == [1, 1]
 
-# latt = [-2.0 2.0 2.0; 2.0 -2.0 2.0; 2.0 2.0 -2.0]
-# positions = [0.0 0.0 0.0]
-# types = [1]
-# num_atom = 1
-# db = spg_get_dataset(latt, positions, types, num_atom, 1e-5)
+# test determine the row and column type of latt and pos
+latt = [4.0 0.0 0.0; 2.0 3.4641 0.0; 0.0 0.0 12.0]
+positions = [0.0 0.0 0.0; 1/3 1/3 1/3]
+types = [1, 1]
+num_atom = 2
+s, n = get_spacegroup(latt, positions, types, 1e-3)
+@test startswith(s, "P-3m1")
+@test n == 164
