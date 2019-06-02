@@ -17,11 +17,13 @@ end
 # Export our two super-useful functions
 export find_primitive, refine_cell, standardize_cell,
         spg_get_dataset, get_spacegroup, get_symmetry,
-        niggli_reduce, delaunay_reduce
+        niggli_reduce, delaunay_reduce,
+        ir_reciprocal_mesh
 
 include("symmetrydb.jl")
 include("standardize_cell.jl")
 include("standardize_latt.jl")
+include("ir_mesh.jl")
 
 
 end #module LibSymspg

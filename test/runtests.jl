@@ -40,3 +40,13 @@ r, t, eq_atoms = get_symmetry(latt, positions, types, 1e-3)
 latt = [4.0 20.0 0.0; 0.0 2.0 0.0; 0.0 0.0 12.0]
 @test niggli_reduce(latt, 1e-3) ≈ [0.0 -2.0 0.0; 4.0 0.0 0.0; 0.0 0.0 12.0]
 @test delaunay_reduce(latt, 1e-3) ≈ [0.0 2.0 0.0; -4.0 -0.0 0.0; -0.0 -0.0 12.0]
+
+# ir_mesh test
+latt = [-2.0 2.0 2.0; 2.0 -2.0 2.0; 2.0 2.0 -2.0]
+positions = [0.0 0.0 0.0]
+types = [1]
+na = 1
+meshk = [4, 4, 4]
+is_shift = [0, 0, 0]
+nir, kgrid, mapping = ir_reciprocal_mesh(latt, positions, types, na, meshk, is_shift, 1, 1e-5)
+@test nir == 8
