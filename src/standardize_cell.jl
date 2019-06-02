@@ -4,9 +4,9 @@ export find_primitive, refine_cell, standardize_cell
 spg_standardize_cell standardize cell
 
 lattice are represented as row vector here
-means each colume is a basis of lattice
-positions are represented as row vector
-means each row is a coordinate (x, y, z) of an atom
+means each row is a basis of lattice
+positions are represented as column vector
+means each column is a coordinate (x, y, z) of an atom
 """
 function spg_standardize_cell(lattice::Array{Float64, 2},
                               positions::Array{Float64, 2},
@@ -16,11 +16,11 @@ function spg_standardize_cell(lattice::Array{Float64, 2},
                               no_idealize::Int64,
                               symprec::Float64=1e-5)
 
-    @assert size(positions)[1] == size(types)[1] == num_atom
+    @assert size(positions)[2] == size(types)[1] == num_atom
 
     # transpose to colomn vector used by spglib
     lattice_ = copy(lattice)
-    positions = Array{Float64, 2}(positions')
+    positions_ = copy(positions)
 
     allocN = 4
     positions_ = zeros(Float64, 3, num_atom*allocN)
@@ -42,9 +42,6 @@ function spg_standardize_cell(lattice::Array{Float64, 2},
     positions = positions_[:, 1:num_primitive_atom]
     types = types_[1:num_primitive_atom]
 
-    # transpose back to row vectors
-    positions = Array{Float64, 2}(positions')
-
     return lattice_, positions, Base.cconvert(Array{Int64, 1}, types), Base.cconvert(Int64,num_primitive_atom)
 end
 
@@ -63,14 +60,6 @@ function standardize_cell(lattice::Array{Float64, 2},
     return spg_standardize_cell(lattice, positions, types, num_atom, to_primitive_, no_idealize_, symprec)
 end
 
-"""
-find_primitive reduce crystal to its primitive
-
-lattice are represented as row vector here
-means each colume is a basis of lattice
-while positions are represented as row vector
-means each row is a coordinate (x, y, z) of an atom
-"""
 function find_primitive(lattice::Array{Float64, 2},
                             positions::Array{Float64, 2},
                             types::Array{Int64, 1},
@@ -79,14 +68,6 @@ function find_primitive(lattice::Array{Float64, 2},
     return standardize_cell(lattice, positions, types, true, false, symprec)
 end
 
-"""
-refine_cell refine crystal to its convetional
-
-lattice are represented as row vector here
-means each colume is a basis of lattice
-while positions are represented as row vector
-means each row is a coordinate (x, y, z) of an atom
-"""
 function refine_cell(lattice::Array{Float64, 2},
                          positions::Array{Float64, 2},
                          types::Array{Int64, 1},

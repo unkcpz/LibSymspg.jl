@@ -9,9 +9,7 @@ function ir_reciprocal_mesh(lattice::Array{Float64, 2},
                             is_time_reversal=1,
                             symprec::Float64=1e-5)
     #
-    @assert size(positions)[1] == size(types)[1] == num_atom
-
-    positions = Array{Float64, 2}(positions')
+    @assert size(positions)[2] == size(types)[1] == num_atom
 
     cmeshk = Base.cconvert( Array{Int32,1}, meshk )
     cis_shift = Base.cconvert( Array{Int32,1}, is_shift )

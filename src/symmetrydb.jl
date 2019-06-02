@@ -31,10 +31,7 @@ function spg_get_dataset(lattice::Array{Float64, 2},
                          num_atom::Int64,
                          symprec::Float64=1e-5)
 
-    @assert size(positions)[1] == size(types)[1] == num_atom
-
-    # transpose to colomn vector used by spglib
-    positions = Array{Float64, 2}(positions')
+    @assert size(positions)[2] == size(types)[1] == num_atom
 
     types = Base.cconvert(Array{Int32, 1}, types)
     num_atom = Base.cconvert(Int32, num_atom)
@@ -57,6 +54,8 @@ function get_spacegroup(lattice::Array{Float64, 2},
 
     db = spg_get_dataset(lattice, positions, types, num_atom, symprec)
     s = collect(Char.(db.international_symbol))
+    # BUG not output
+    # println(collect(Char.(db.pointgroup_symbol)))
     return String(s), Base.convert(Int64, db.spacegroup_number)
 end
 
