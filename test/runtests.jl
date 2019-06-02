@@ -32,3 +32,7 @@ num_atom = 2
 s, n = get_spacegroup(latt, positions, types, 1e-3)
 @test startswith(s, "P-3m1")
 @test n == 164
+
+r, t, eq_atoms = get_symmetry(latt, positions, types, 1e-3)
+@test size(r)[3] == size(t)[2] == 12
+@test eq_atoms == [0, 0]

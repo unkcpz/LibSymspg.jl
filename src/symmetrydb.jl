@@ -1,4 +1,4 @@
-export get_spacegroup
+export get_spacegroup, get_symmetry
 
 mutable struct SpglibDB
     spacegroup_number::Cint
@@ -60,8 +60,29 @@ function get_spacegroup(lattice::Array{Float64, 2},
     return String(s), Base.convert(Int64, db.spacegroup_number)
 end
 
-function get_symmetry()
-end
+"""
+rotations output as 3x3xNop array
+translations output as 3xNop array
+"""
+function get_symmetry(lattice::Array{Float64, 2},
+                      positions::Array{Float64, 2},
+                      types::Array{Int64, 1},
+                      symprec::Float64=1e-5)
+    #
+    num_atom = size(types)[1]
 
-function get_smmetry_database()
+    db = spg_get_dataset(lattice, positions, types, num_atom, symprec)
+    nop = db.n_operations
+    r = unsafe_wrap(Array{NTuple{9, Cint}}, db.rotations, nop)
+    t = unsafe_wrap(Array{NTuple{3, Float64}}, db.translations, nop)
+    r_ = Array{Int64, 3}(undef, 3, 3, nop)
+    t_ = Array{Float64, 2}(undef, 3, nop)
+    for i in 1:nop
+        r_[:, :, i] = reshape([Base.convert(Int64, e) for e in r[i]], 3, 3)
+        t_[:, i] = [e for e in t[i]]
+    end
+
+    n_atoms = db.n_atoms
+    eq_atoms = unsafe_wrap(Array{Cint}, db.equivalent_atoms, n_atoms)
+    return r_, t_, Base.convert(Array{Int64, 1}, eq_atoms)
 end
