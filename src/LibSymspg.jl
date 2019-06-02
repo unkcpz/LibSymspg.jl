@@ -16,9 +16,12 @@ end
 
 # Export our two super-useful functions
 export find_primitive, refine_cell, standardize_cell,
-        spg_get_dataset, get_spacegroup, get_symmetry
+        spg_get_dataset, get_spacegroup, get_symmetry,
+        niggli_reduce, delaunay_reduce
 
 include("symmetrydb.jl")
 include("standardize_cell.jl")
+include("standardize_latt.jl")
+
 
 end #module LibSymspg

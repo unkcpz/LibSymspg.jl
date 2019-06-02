@@ -36,3 +36,7 @@ s, n = get_spacegroup(latt, positions, types, 1e-3)
 r, t, eq_atoms = get_symmetry(latt, positions, types, 1e-3)
 @test size(r)[3] == size(t)[2] == 12
 @test eq_atoms == [0, 0]
+
+latt = [4.0 20.0 0.0; 0.0 2.0 0.0; 0.0 0.0 12.0]
+@test niggli_reduce(latt, 1e-3) ≈ [0.0 -2.0 0.0; 4.0 0.0 0.0; 0.0 0.0 12.0]
+@test delaunay_reduce(latt, 1e-3) ≈ [0.0 2.0 0.0; -4.0 -0.0 0.0; -0.0 -0.0 12.0]
