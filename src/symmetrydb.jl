@@ -3,9 +3,9 @@ export get_spacegroup, get_symmetry
 mutable struct SpglibDB
     spacegroup_number::Cint
     hall_number::Cint
-    international_symbol::NTuple{11, Cchar}
-    hall_symbol::NTuple{17, Cchar}
-    choice::NTuple{6, Cchar}
+    international_symbol::NTuple{11, UInt8}
+    hall_symbol::NTuple{17, UInt8}
+    choice::NTuple{6, UInt8}
     transformation_matrix::NTuple{9, Float64}
     origin_shift::NTuple{3, Float64}
     n_operations::Cint
@@ -13,7 +13,7 @@ mutable struct SpglibDB
     translations::Ptr{NTuple{3, Float64}}
     n_atoms::Cint
     wyckoffs::Ptr{Cint}
-    site_symmetry_symbols::Ptr{Tuple{7, Cchar}}
+    site_symmetry_symbols::Ptr{Tuple{7, UInt8}}
     equivalent_atoms::Ptr{Cint}
     mapping_to_primitive::Ptr{Cint}
     n_std_atoms::Cint
@@ -22,7 +22,7 @@ mutable struct SpglibDB
     std_positions::Ptr{NTuple{3, Float64}}
     std_rotation_matrix::Ptr{NTuple{9, Float64}}
     std_mapping_to_primitive::Ptr{Cint}
-    pointgroup_symbol::NTuple{6, Cchar}
+    pointgroup_symbol::NTuple{6, UInt8}
 end
 
 function spg_get_dataset(lattice::Array{Float64, 2},
