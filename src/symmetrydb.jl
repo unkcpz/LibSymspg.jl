@@ -36,12 +36,11 @@ function spg_get_dataset(lattice::Array{Float64, 2},
     types = Base.cconvert(Array{Int32, 1}, types)
     num_atom = Base.cconvert(Int32, num_atom)
 
-    ptr_cdb =
-    ccall( (:spg_get_dataset, libsymspg), Ptr{SpglibDB},
+    db =
+    ccall( (:spg_get_dataset, libsymspg), Ref{SpglibDB},
            ( Ptr{Float64}, Ptr{Float64}, Ptr{Int32}, Int32, Float64 ),
            lattice, positions, types, num_atom, symprec )
 
-    db = unsafe_load(ptr_cdb)
     return db
 end
 
