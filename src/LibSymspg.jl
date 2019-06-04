@@ -14,37 +14,10 @@ function __init__()
     check_deps()
 end
 
-export char2Str, rotsFromTuple, transFromTuple
-
-function char2Str(charTuple::Tuple{Vararg{UInt8}})
-    cs = collect(charTuple)
-    idx = 1
-    for i in eachindex(cs)
-        if cs[i] == 0
-            break
-        end
-        idx = i
-    end
-    cs = Char.(cs[1:idx])
-
-    return String(cs)
-end
-
-function rotsFromTuple(rotsTuple::Array{NTuple{9,Int32},1}, nop::Integer)
-    r = Array{Int64,3}(undef, 3, 3, nop)
-    for i in 1:nop
-        r[:,:,i] = reshape([Base.convert(Int64, e) for e in rotsTuple[i]], 3, 3)
-    end
-    return r
-end
-
-function transFromTuple(transTuple::Array{NTuple{3,Float64}}, nop::Integer)
-    t = Array{Float64,2}(undef, 3, nop)
-    for i in 1:nop
-        t[:,i] = [e for e in transTuple[i]]
-    end
-    return t
-end
+export find_primitive, refine_cell,
+        niggli_reduce!, delaunay_reduce!,
+        ir_reciprocal_mesh,
+        get_spacegroup, get_symmetry
 
 include("version.jl")
 include("symmetry-api.jl")
@@ -52,6 +25,117 @@ include("spacegroup-api.jl")
 include("cell-reduce-api.jl")
 include("latt-reduce-api.jl")
 include("ir-mesh-api.jl")
+include("utils.jl")
 
+
+"""
+return type: String, Int64 -> (symbol, spg_number)
+"""
+function get_spacegroup(lattice::Array{Float64, 2},
+                         positions::Array{Float64, 2},
+                         types::Array{Int64, 1},
+                         num_atom::Int64,
+                         symprec::Float64=1e-5)
+    #
+    db = spg_get_dataset(lattice, positions, types, num_atom, symprec)
+    return char2Str(db.international_symbol), Base.convert(Int64, db.spacegroup_number)
+end
+
+"""
+get_symmetry
+"""
+function get_symmetry(lattice::Array{Float64, 2},
+                      positions::Array{Float64, 2},
+                      types::Array{Int64, 1},
+                      num_atom::Int64,
+                      symprec::Float64=1e-5)
+    #
+    max_size = 48*num_atom
+    rots = Array{Cint, 3}(undef, 3, 3, max_size)
+    trans = Array{Float64, 2}(undef, 3, max_size)
+
+    nop = spg_get_symmetry!(rots, trans, max_size, lattice, positions, types, num_atom, symprec)
+    @assert nop ≠ 0
+
+    return Base.convert(Array{Int64, 3}, rots[:,:,1:nop]), trans[:,1:nop]
+end
+
+function get_symmetry(lattice::Array{Float64, 2},
+                      positions::Array{Float64, 2},
+                      types::Array{Int64, 1},
+                      symprec::Float64=1e-5)
+    #
+    @assert size(positions)[2] == size(types)[1]
+    num_atom = size(types)[1]
+
+    return get_symmetry(lattice, positions, types, num_atom, symprec)
+end
+"""
+"""
+find_primitive(lattice::Array{Float64, 2},
+               positions::Array{Float64, 2},
+               types::Array{Int64, 1},
+               symprec::Float64) =
+    spg_find_primitive(lattice, positions, types, symprec)
+
+find_primitive(lattice::Array{Float64, 2},
+                positions::Array{Float64, 2},
+                types::Array{Int64, 1},
+                symprec::Float64,
+                angle_tolerance::Float64) =
+    spgat_find_primitive(lattice, positions, types, symprec, angle_tolerance)
+
+"""
+"""
+refine_cell(lattice::Array{Float64, 2},
+            positions::Array{Float64, 2},
+            types::Array{Int64, 1},
+            symprec::Float64) =
+    spg_refine_cell(lattice, positions, types, symprec)
+
+refine_cell(lattice::Array{Float64, 2},
+            positions::Array{Float64, 2},
+            types::Array{Int64, 1},
+            symprec::Float64,
+            angle_tolerance::Float64) =
+    spgat_refine_cell(lattice, positions, types, symprec, angle_tolerance)
+
+"""
+"""
+niggli_reduce! = spg_niggli_reduce!
+
+"""
+"""
+delaunay_reduce! = spg_delaunay_reduce!
+
+"""
+"""
+function ir_reciprocal_mesh(mesh::Array{Int64, 1},
+                            is_shift::Array{Int64, 1},
+                            is_time_reversal::Int64,
+                            lattice::Array{Float64, 2},
+                            positions::Array{Float64, 2},
+                            types::Array{Int64, 1},
+                            num_atom::Int64,
+                            symprec::Float64=1e-5)
+    return spg_get_ir_reciprocal_mesh(mesh, is_shift, is_time_reversal,
+                                    lattice, positions, types, num_atom, symprec)
+end
+
+function ir_reciprocal_mesh(mesh::Array{Int64, 1},
+                            is_shift::Array{Bool, 1},
+                            is_time_reversal::Bool,
+                            lattice::Array{Float64, 2},
+                            positions::Array{Float64, 2},
+                            types::Array{Int64, 1},
+                            num_atom::Int64,
+                            symprec::Float64=1e-5)
+    #
+    is_shift = [flag ? 1 : 0 for flag in is_shift]
+    is_time_reversal = is_time_reversal ? 1 : 0
+
+    return spg_get_ir_reciprocal_mesh(mesh, is_shift, is_time_reversal,
+                                    lattice, positions, types, num_atom, symprec)
+end
 
 end #module LibSymspg

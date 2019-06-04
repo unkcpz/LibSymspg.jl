@@ -1,6 +1,16 @@
-# Spglib.jl
-[![Build Status](https://travis-ci.org/unkcpz/Spglib.jl.svg?branch=master)](https://travis-ci.org/unkcpz/Spglib.jl)
-julia wrapper for library spglib
+# LibSymspg.jl
+
+[![Build Status](https://travis-ci.org/unkcpz/LibSymspg.jl.svg?branch=master)](https://travis-ci.org/unkcpz/LibSymspg.jl)
+
+julia wrapper of library [spglib](https://github.com/atztogo/spglib)
+
+Binary built by using [BinaryBuilder](https://github.com/JuliaPackaging/BinaryBuilder.jl) and provided by [BinaryProvider](https://github.com/JuliaPackaging/BinaryProvider.jl).
+
+Now it is registered in [JuliaRegisties](https://github.com/JuliaRegistries/General), thus can be installed by running:
+
+```sh
+(v1.1) pkg> add LibSymspg
+```
 
 Lattice is represented as row vector,
 while positions are represented as column vector which
@@ -24,7 +34,5 @@ latt = [4.0 0.0 0.0; 2.0 3.4641 0.0; 0.0 0.0 12.0]
 positions = [0.0 1/3; 0.0 1/3; 0.0 1/3]
 types = [1, 1]
 num_atom = 2
-s, n = get_spacegroup(latt, positions, types, 1e-3)
-@test startswith(s, "P-3m1")
-@test n == 164
+@test get_spacegroup(latt, positions, types, 1e-3) == ("P-3m1", 164)
 ```

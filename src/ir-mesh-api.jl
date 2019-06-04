@@ -1,4 +1,4 @@
-function ir_reciprocal_mesh(mesh::Array{Int64, 1},
+function spg_get_ir_reciprocal_mesh(mesh::Array{Int64, 1},
                             is_shift::Array{Int64, 1},
                             is_time_reversal::Int64,
                             lattice::Array{Float64, 2},
