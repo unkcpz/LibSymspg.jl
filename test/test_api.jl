@@ -98,6 +98,18 @@ end
     @test nir == 8
 end
 
+# @testset "reciprocal mesh" begin
+#     latt = [0.0 5.0 5.0; 5.0 0.0 5.0; 5.0 5.0 0.0]
+#     positions = Array{Float64, 2}([0.0 0.25; 0.0 0.25; 0.0 0.25])
+#     types = [1, 1]
+#     na = 2
+#     mesh = [3,3,3]
+#     is_shift = [1,1,1]
+#     nir, grid_address, ir_mapping_table =
+#         LibSymspg.spg_get_ir_reciprocal_mesh(mesh, is_shift, 1, latt, positions, types, na, 1e-5)
+#     @test nir == 4
+# end
+
 @testset "Cell reduce standardize" begin
     latt = [4.0 0.0 0.0;
             0.0 4.0 0.0;

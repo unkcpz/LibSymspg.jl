@@ -38,17 +38,17 @@ end
     @test latt ≈ [0.0 2.0 0.0; -4.0 -0.0 0.0; -0.0 -0.0 12.0]
 end
 
-@testset "reciprocal mesh(export)" begin
-    latt = [-2.0 2.0 2.0; 2.0 -2.0 2.0; 2.0 2.0 -2.0]
-    positions = Array{Float64, 2}([0.0 0.0 0.0]')
-    types = [1]
-    na = 1
-    mesh = [4, 4, 4]
-    is_shift = [false, false, false]
-    nir, grid_address, ir_mapping_table =
-        ir_reciprocal_mesh(mesh, is_shift, true, latt, positions, types, na, 1e-5)
-    @test nir == 8
-end
+# @testset "reciprocal mesh(export)" begin
+#     latt = [5.0 0.0 5.0; 0.0 5.0 5.0; 5.0 5.0 0.0]
+#     positions = Array{Float64, 2}([0.0 0.25; 0.0 0.25; 0.0 0.25])
+#     types = [1, 1]
+#     na = 2
+#     mesh = [3,3,3]
+#     is_shift = [true,true,true]
+#     nir, grid_address, ir_mapping_table =
+#         ir_reciprocal_mesh(mesh, is_shift, true, latt, positions, types, na, 1e-5)
+#     @test nir == 4
+# end
 
 @testset "symmetry(export)" begin
     latt = [4.0 0.0 0.0; 2.0 3.4641 0.0; 0.0 0.0 12.0]

@@ -30,6 +30,8 @@ latt, positions, types = refine_cell(latt, positions, types, 1e-5)
 @test types == [1, 1]
 
 # test determine the row and column type of latt and pos
+# lattice is represented as row vectors
+# positions represented as column vectors
 latt = [4.0 0.0 0.0; 2.0 3.4641 0.0; 0.0 0.0 12.0]
 positions = [0.0 1/3; 0.0 1/3; 0.0 1/3]
 types = [1, 1]
