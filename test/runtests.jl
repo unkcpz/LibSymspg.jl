@@ -58,6 +58,7 @@ end
     @test get_spacegroup(latt, positions, types, num_atom) == ("P-3m1", 164)
 
     rots, trans = get_symmetry(latt, positions, types, 1e-3)
-    @test size(rots) == (3, 3, 12)
-    @test size(trans) == (3, 12)
+    @test length(rots) == length(trans) == 12
+    @test size(rots[1]) == (3, 3)
+    @test size(trans[1]) == (3,)
 end

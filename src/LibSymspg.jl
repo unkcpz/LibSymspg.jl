@@ -57,7 +57,14 @@ function get_symmetry(lattice::Array{Float64, 2},
     nop = spg_get_symmetry!(rots, trans, max_size, lattice, positions, types, num_atom, symprec)
     @assert nop ≠ 0
 
-    return Base.convert(Array{Int64, 3}, rots[:,:,1:nop]), trans[:,1:nop]
+    op_rots = Vector{Array{Int, 2}}(undef, nop)
+    op_trans = Vector{Vector{Float64}}(undef, nop)
+    for i in 1:nop
+        op_rots[i] = rots[:, :, i]
+        op_trans[i] = trans[:, i]
+    end
+
+    op_rots, op_trans
 end
 
 function get_symmetry(lattice::Array{Float64, 2},
