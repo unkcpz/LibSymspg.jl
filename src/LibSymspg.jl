@@ -37,6 +37,7 @@ function get_spacegroup(lattice::Array{Float64, 2},
                          num_atom::Int64,
                          symprec::Float64=1e-5)
     #
+    positions = Array(transpose(positions))
     db = spg_get_dataset(lattice, positions, types, num_atom, symprec)
     return char2Str(db.international_symbol), Base.convert(Int64, db.spacegroup_number)
 end
@@ -50,6 +51,7 @@ function get_symmetry(lattice::Array{Float64, 2},
                       num_atom::Int64,
                       symprec::Float64=1e-5)
     #
+    positions = Array(transpose(positions))
     max_size = 48*num_atom
     rots = Array{Cint, 3}(undef, 3, 3, max_size)
     trans = Array{Float64, 2}(undef, 3, max_size)
@@ -72,40 +74,61 @@ function get_symmetry(lattice::Array{Float64, 2},
                       types::Array{Int64, 1},
                       symprec::Float64=1e-5)
     #
-    @assert size(positions)[2] == size(types)[1]
+    @assert size(positions)[1] == size(types)[1]
     num_atom = size(types)[1]
 
     return get_symmetry(lattice, positions, types, num_atom, symprec)
 end
 """
 """
-find_primitive(lattice::Array{Float64, 2},
+function find_primitive(lattice::Array{Float64, 2},
                positions::Array{Float64, 2},
                types::Array{Int64, 1},
-               symprec::Float64) =
-    spg_find_primitive(lattice, positions, types, symprec)
+               symprec::Float64)
 
-find_primitive(lattice::Array{Float64, 2},
+    positions = Array(transpose(positions))
+    res_lattice, res_positions, res_types, res_N = spg_find_primitive(lattice, positions, types, symprec)
+
+    res_lattice, Array(transpose(res_positions)), res_types, res_N
+end
+
+function find_primitive(lattice::Array{Float64, 2},
                 positions::Array{Float64, 2},
                 types::Array{Int64, 1},
                 symprec::Float64,
-                angle_tolerance::Float64) =
-    spgat_find_primitive(lattice, positions, types, symprec, angle_tolerance)
+                angle_tolerance::Float64)
+
+    positions = Array(transpose(positions))
+    res_lattice, res_positions, res_types, res_N = spgat_find_primitive(lattice, positions, types, symprec, angle_tolerance)
+
+    res_lattice, Array(transpose(res_positions)), res_types, res_N
+end
 
 """
 """
-refine_cell(lattice::Array{Float64, 2},
+function refine_cell(lattice::Array{Float64, 2},
             positions::Array{Float64, 2},
             types::Array{Int64, 1},
-            symprec::Float64) =
-    spg_refine_cell(lattice, positions, types, symprec)
+            symprec::Float64)
 
-refine_cell(lattice::Array{Float64, 2},
+
+    positions = Array(transpose(positions))
+    res_lattice, res_positions, res_types, res_N = spg_refine_cell(lattice, positions, types, symprec)
+
+    res_lattice, Array(transpose(res_positions)), res_types, res_N
+end
+
+function refine_cell(lattice::Array{Float64, 2},
             positions::Array{Float64, 2},
             types::Array{Int64, 1},
             symprec::Float64,
-            angle_tolerance::Float64) =
-    spgat_refine_cell(lattice, positions, types, symprec, angle_tolerance)
+            angle_tolerance::Float64)
+
+    positions = Array(transpose(positions))
+    res_lattice, res_positions, res_types, res_N = spgat_refine_cell(lattice, positions, types, symprec, angle_tolerance)
+
+    res_lattice, Array(transpose(res_positions)), res_types, res_N
+end
 
 """
 """
@@ -118,18 +141,6 @@ delaunay_reduce! = spg_delaunay_reduce!
 """
 """
 function ir_reciprocal_mesh(mesh::Array{Int64, 1},
-                            is_shift::Array{Int64, 1},
-                            is_time_reversal::Int64,
-                            lattice::Array{Float64, 2},
-                            positions::Array{Float64, 2},
-                            types::Array{Int64, 1},
-                            num_atom::Int64,
-                            symprec::Float64=1e-5)
-    return spg_get_ir_reciprocal_mesh(mesh, is_shift, is_time_reversal,
-                                    lattice, positions, types, num_atom, symprec)
-end
-
-function ir_reciprocal_mesh(mesh::Array{Int64, 1},
                             is_shift::Array{Bool, 1},
                             is_time_reversal::Bool,
                             lattice::Array{Float64, 2},
@@ -138,6 +149,7 @@ function ir_reciprocal_mesh(mesh::Array{Int64, 1},
                             num_atom::Int64,
                             symprec::Float64=1e-5)
     #
+    positions = Array(transpose(positions))
     is_shift = [flag ? 1 : 0 for flag in is_shift]
     is_time_reversal = is_time_reversal ? 1 : 0
 

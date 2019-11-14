@@ -12,9 +12,21 @@ Now it is registered in [JuliaRegisties](https://github.com/JuliaRegistries/Gene
 (v1.1) pkg> add LibSymspg
 ```
 
+The package are seperated into two parts, api and practical part.
+API part is used for quickly and easily wrapper the C-API of spglib.
+While the practical part have the most representative data struacture that can be used directly.
+
+In the api-part
 Lattice is represented as row vector,
 while positions are represented as column vector which
 compatible with spglib's C-API.
+
+While In the practicl (LibSymspg.jl) part
+Lattice is represented as row vector, and positions are also represented as row vector,
+which is compatible with struture input data structure of most simulation software.
+
+The output of the `get_symmetry` function is a vector of rotations (3x3 matrix) and a vector of translates (3x1 vectors) and the number of operations.
+
 
 [Here](https://atztogo.github.io/spglib/definition.html) is the definition about how crystal transform when rotation and transformation applied.
 
@@ -22,19 +34,21 @@ compatible with spglib's C-API.
 using LibSymspg
 
 latt = [-2.0 2.0 2.0; 2.0 -2.0 2.0; 2.0 2.0 -2.0]
-positions = Array{Float64, 2}([0.0 0.0 0.0]')
+positions = [0.0 0.0 0.0]
 types = [1]
 latt, positions, types = refine_cell(latt, positions, types, 1e-5)
 @test latt ≈ [4.0 0.0 0.0; 0.0 4.0 0.0; 0.0 0.0 4.0]
-@test positions ≈ [0.0 0.5; 0.0 0.5; 0.0 0.5]
+@test positions ≈ [0.0 0.0 0.0; 0.5 0.5 0.5]
 @test types == [1, 1]
 
 # test determine the row and column type of latt and pos
 # lattice is represented as row vectors
 # positions represented as column vectors
 latt = [4.0 0.0 0.0; 2.0 3.4641 0.0; 0.0 0.0 12.0]
-positions = [0.0 1/3; 0.0 1/3; 0.0 1/3]
+positions = [0.0 0.0 0.0; 1/3 1/3 1/3]
 types = [1, 1]
 num_atom = 2
 @test get_spacegroup(latt, positions, types, 1e-3) == ("P-3m1", 164)
+@test size(rots[1]) == (3, 3)
+@test size(trans[1]) == (3,)
 ```
